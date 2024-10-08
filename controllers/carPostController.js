@@ -11,11 +11,7 @@ exports.createCarPost = async (req, res) => {
         .json({ error: "createdByUser must be a valid user ID." });
     }
 
-    const picturesUrls = req.files.map((file) => {
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
-      const relativePath = file.path.replace(/\\/g, "/");
-      return `${baseUrl}/${relativePath}`;
-    });
+    const picturesUrls = req.files.map((file) => file.path);
 
     const newCarPost = new CarPost({
       carModel,
@@ -23,7 +19,7 @@ exports.createCarPost = async (req, res) => {
       phoneNumber,
       city,
       picturesUrls,
-      createdByUser, // This is now the user ID (ObjectId)
+      createdByUser,
     });
 
     await newCarPost.save();

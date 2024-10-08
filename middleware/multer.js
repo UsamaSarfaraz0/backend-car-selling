@@ -1,23 +1,21 @@
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 const path = require("path");
-const fs = require("fs");
+require("dotenv").config();
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    console.log("Body", req.body);
-    const userId = req.body.createdByUser;
-    const carModel = req.body.carModel;
-    const dir = `./data/${userId}/${carModel}`;
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    fs.mkdirSync(dir, { recursive: true });
-
-    cb(null, dir);
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "car_posts",
+    format: async (req, file) => "png",
+    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
   },
 });
 
